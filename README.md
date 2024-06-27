@@ -18,7 +18,7 @@ Here are some of the projects featured in this portfolio:
 
 ## Contact
 
-Feel free to reach out to me via [email@example.com](mailto:email@example.com).
+Feel free to reach out to me via [nhtun413@gmail.com](mailto:nhtun413@gmail.com).
 
 ## License
 
