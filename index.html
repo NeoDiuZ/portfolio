@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Name</title>
+  <meta name="description" content="Developer and founder. Building things that didn't exist before.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ══════════════════════════════════════════════
+       TOKENS
+    ══════════════════════════════════════════════ */
+    :root {
+      --bg:      #060509;
+      --text:    #EDE7DD;
+      --muted:   #7B7487;
+      --dim:     #3E3A4D;
+      --border:  rgba(255, 255, 255, 0.07);
+      --v:       #8B5CF6;
+      --p:       #EC4899;
+      --o:       #F97316;
+      --glow-v:  rgba(139,  92, 246, 0.18);
+      --glow-p:  rgba(236,  72, 153, 0.14);
+      --glow-o:  rgba(249, 115,  22, 0.12);
+
+      --f-head: 'Syne', sans-serif;
+      --f-body: 'Space Grotesk', sans-serif;
+    }
+
+    /* ══════════════════════════════════════════════
+       RESET
+    ══════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--f-body);
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      cursor: none;
+    }
+
+    ::selection { background: rgba(139, 92, 246, 0.28); color: var(--text); }
+
+    /* ══════════════════════════════════════════════
+       CUSTOM CURSOR
+    ══════════════════════════════════════════════ */
+    #c-dot {
+      position: fixed;
+      width: 8px;
+      height: 8px;
+      background: var(--text);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1000;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: difference;
+      transition: width 0.25s, height 0.25s;
+    }
+
+    #c-ring {
+      position: fixed;
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(237, 231, 221, 0.3);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 999;
+      transform: translate(-50%, -50%);
+      transition: width 0.35s cubic-bezier(0.16,1,0.3,1),
+                  height 0.35s cubic-bezier(0.16,1,0.3,1),
+                  border-color 0.35s;
+    }
+
+    body.hovering #c-ring {
+      width: 64px;
+      height: 64px;
+      border-color: rgba(139, 92, 246, 0.5);
+    }
+
+    body.hovering #c-dot {
+      width: 5px;
+      height: 5px;
+    }
+
+    /* ══════════════════════════════════════════════
+       FILM GRAIN
+    ══════════════════════════════════════════════ */
+    #grain {
+      position: fixed;
+      inset: -100%;
+      width: 300%;
+      height: 300%;
+      z-index: 997;
+      pointer-events: none;
+      opacity: 0.035;
+      background-size: 256px 256px;
+      animation: grain 0.65s steps(2) infinite;
+    }
+
+    @keyframes grain {
+      0%   { transform: translate(0, 0); }
+      25%  { transform: translate(-3%, 2%); }
+      50%  { transform: translate(2%, -3%); }
+      75%  { transform: translate(-1%, 3%); }
+      100% { transform: translate(3%, -1%); }
+    }
+
+    /* ══════════════════════════════════════════════
+       NAV
+    ══════════════════════════════════════════════ */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 500;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2.25rem 3rem;
+      pointer-events: none;
+    }
+
+    nav > * { pointer-events: all; }
+
+    .nav-logo {
+      font-family: var(--f-head);
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-events: -0.01em;
+      color: var(--text);
+      text-decoration: none;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+
+    .nav-logo:hover { opacity: 1; }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    /* ══════════════════════════════════════════════
+       HERO
+    ══════════════════════════════════════════════ */
+    #hero {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 600px;
+      overflow: hidden;
+    }
+
+    #hero-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Bottom fade into next section */
+    #hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 45%, transparent 40%, rgba(6,5,9,0.6) 75%, var(--bg) 100%),
+        linear-gradient(to bottom, transparent 60%, var(--bg) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .hero-text {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 3;
+      padding: 0 3rem 3.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .hero-name {
+      font-family: var(--f-head);
+      font-size: clamp(5rem, 12.5vw, 11.5rem);
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -0.045em;
+      color: var(--text);
+      user-select: none;
+    }
+
+    .hero-side {
+      text-align: right;
+      max-width: 260px;
+      padding-bottom: 0.5rem;
+    }
+
+    .hero-role {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.01em;
+    }
+
+    .hero-line {
+      font-size: 0.8rem;
+      color: var(--dim);
+      line-height: 1.55;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-scroll {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--dim);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(5px); }
+    }
+
+    /* ══════════════════════════════════════════════
+       SECTIONS (shared)
+    ══════════════════════════════════════════════ */
+    .s {
+      background: var(--bg);
+      padding: 8rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .s-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 4rem;
+      display: block;
+    }
+
+    /* ══════════════════════════════════════════════
+       ABOUT
+    ══════════════════════════════════════════════ */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    .about-manifesto {
+      font-family: var(--f-head);
+      font-size: clamp(1.55rem, 2.8vw, 2.3rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.35;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .about-manifesto em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--v), var(--p));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .about-body p {
+      font-size: 1rem;
+      color: var(--muted);
+      line-height: 1.9;
+      margin-bottom: 1.25rem;
+    }
+
+    .about-body p:last-child { margin-bottom: 0; }
+
+    /* ══════════════════════════════════════════════
+       WORK
+    ══════════════════════════════════════════════ */
+    .work-list {
+      list-style: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .work-item {
+      display: grid;
+      grid-template-columns: 3.5rem 1fr auto;
+      gap: 0 2rem;
+      align-items: center;
+      padding: 2.25rem 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: padding-left 0.4s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .work-item:hover { padding-left: 1rem; }
+
+    .work-num {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--dim);
+      align-self: start;
+      padding-top: 0.25rem;
+    }
+
+    .work-body {}
+
+    .work-title {
+      font-family: var(--f-head);
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+      transition: color 0.2s;
+      line-height: 1.1;
+    }
+
+    .work-item:hover .work-title { color: var(--v); }
+
+    .work-meta {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .work-desc {
+      font-size: 0.88rem;
+      color: var(--dim);
+      line-height: 1.65;
+      max-width: 560px;
+    }
+
+    .work-year {
+      font-size: 0.75rem;
+      color: var(--dim);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+      align-self: start;
+      padding-top: 0.3rem;
+      white-space: nowrap;
+    }
+
+    /* arrow icon */
+    .work-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      color: var(--dim);
+      transition: all 0.25s;
+      flex-shrink: 0;
+      align-self: start;
+      margin-top: 0.2rem;
+    }
+
+    .work-item:hover .work-arrow {
+      border-color: var(--v);
+      color: var(--v);
+      transform: rotate(45deg);
+    }
+
+    /* ══════════════════════════════════════════════
+       STACK
+    ══════════════════════════════════════════════ */
+    .stack-text {
+      font-size: 1.1rem;
+      color: var(--muted);
+      line-height: 2.2;
+      max-width: 780px;
+    }
+
+    .stack-text strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ══════════════════════════════════════════════
+       CONTACT
+    ══════════════════════════════════════════════ */
+    #contact .s-inner {
+      text-align: center;
+      padding: 4rem 0;
+    }
+
+    .contact-head {
+      font-family: var(--f-head);
+      font-size: clamp(3.5rem, 9vw, 8.5rem);
+      font-weight: 800;
+      line-height: 0.9;
+      letter-spacing: -0.045em;
+      color: var(--text);
+      margin-bottom: 3rem;
+    }
+
+    .contact-email {
+      display: inline-block;
+      font-family: var(--f-head);
+      font-size: clamp(1.1rem, 2.5vw, 2rem);
+      font-weight: 400;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.1em;
+      transition: color 0.25s, border-color 0.25s;
+    }
+
+    .contact-email:hover {
+      color: var(--v);
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+
+    .socials {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .socials a {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .socials a:hover { color: var(--text); }
+
+    /* ══════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════ */
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      color: var(--dim);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ══════════════════════════════════════════════
+       SCROLL REVEAL
+    ══════════════════════════════════════════════ */
+    .r {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1),
+                  transform 0.85s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .r.in { opacity: 1; transform: none; }
+
+    .r[d="1"] { transition-delay:  80ms; }
+    .r[d="2"] { transition-delay: 160ms; }
+    .r[d="3"] { transition-delay: 240ms; }
+    .r[d="4"] { transition-delay: 320ms; }
+    .r[d="5"] { transition-delay: 400ms; }
+
+    /* ══════════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════════ */
+    @media (max-width: 960px) {
+      nav { padding: 1.75rem 2rem; }
+      .nav-links { gap: 1.75rem; }
+      .s { padding: 6rem 2rem; }
+      .hero-text { padding: 0 2rem 3rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .work-item { grid-template-columns: 2.5rem 1fr; }
+      .work-year, .work-arrow { display: none; }
+      footer { padding: 1.25rem 2rem; }
+    }
+
+    @media (max-width: 640px) {
+      nav { padding: 1.25rem 1.5rem; }
+      .nav-links { display: none; }
+      .s { padding: 5rem 1.5rem; }
+      .hero-text { padding: 0 1.5rem 2.5rem; flex-direction: column; gap: 1.5rem; }
+      .hero-side { text-align: left; }
+      .work-item { padding: 1.75rem 0; }
+      footer { padding: 1.25rem 1.5rem; flex-direction: column; gap: 0.35rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .r { opacity: 1; transform: none; transition: none; }
+      .hero-scroll { animation: none; }
+      html { scroll-behavior: auto; }
+      body { cursor: auto; }
+      #c-dot, #c-ring { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Grain -->
+  <div id="grain" aria-hidden="true"></div>
+
+  <!-- Cursor -->
+  <div id="c-dot"  aria-hidden="true"></div>
+  <div id="c-ring" aria-hidden="true"></div>
+
+  <!-- ═══════════════════════════════════════
+       NAV
+  ════════════════════════════════════════ -->
+  <nav>
+    <a href="#hero" class="nav-logo">YN.</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ═══════════════════════════════════════
+       HERO
+  ════════════════════════════════════════ -->
+  <section id="hero">
+    <canvas id="hero-canvas" aria-hidden="true"></canvas>
+
+    <div class="hero-text">
+      <h1 class="hero-name" aria-label="Your Name">YOUR<br>NAME.</h1>
+      <div class="hero-side">
+        <p class="hero-role">Developer &amp; Founder</p>
+        <p class="hero-line">Building digital experiences<br>at the edge of code &amp; craft.</p>
+        <span class="hero-scroll" aria-hidden="true">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+          Scroll
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       ABOUT
+  ════════════════════════════════════════ -->
+  <section class="s" id="about">
+    <div class="s-inner">
+      <span class="eyebrow r">About</span>
+      <div class="about-grid">
+        <blockquote class="about-manifesto r" d="1">
+          "I believe the space between<br>
+          art and code is where the most<br>
+          <em>interesting</em> work happens."
+        </blockquote>
+        <div class="about-body r" d="2">
+          <p>
+            I'm a software developer and founder with [X] years of experience
+            turning ideas into products. My work spans [industries], always
+            with a focus on craft, clarity, and lasting impact.
+          </p>
+          <p>
+            Before starting my own ventures, I worked at [Previous Company]
+            as [Role], where I [key achievement]. I'm drawn to problems that
+            haven't been solved elegantly yet.
+          </p>
+          <p>
+            Currently building <strong style="color:var(--text);">[Your Current Project]</strong> —
+            [one-sentence description of what it does and why it matters].
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       WORK
+  ════════════════════════════════════════ -->
+  <section class="s" id="work">
+    <div class="s-inner">
+      <span class="eyebrow r">Selected Work</span>
+      <ul class="work-list">
+
+        <li class="work-item r" d="1" tabindex="0" role="link" aria-label="Project Alpha">
+          <span class="work-num">01</span>
+          <div class="work-body">
+            <h3 class="work-title">Project Alpha</h3>
+            <p class="work-meta">React · Node.js · PostgreSQL · AWS</p>
+            <p class="work-desc">
+              Your flagship project. A brief, compelling description — what it solves,
+              who uses it, and the outcome. One or two sentences, punchy.
+            </p>
+          </div>
+          <span class="work-year">2024</span>
+          <div class="work-arrow" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 17L17 7M17 7H7M17 7v10"/>
+            </svg>
+          </div>
+        </li>
+
+        <li class="work-item r" d="2" tabindex="0" role="link" aria-label="Project Beta">
+          <span class="work-num">02</span>
+          <div class="work-body">
+            <h3 class="work-title">Project Beta</h3>
+            <p class="work-meta">TypeScript · Next.js · Stripe · Vercel</p>
+            <p class="work-desc">
+              The core challenge, your approach, and the result. What makes this one
+              technically or conceptually interesting.
+            </p>
+          </div>
+          <span class="work-year">2024</span>
+          <div class="work-arrow" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 17L17 7M17 7H7M17 7v10"/>
+            </svg>
+          </div>
+        </li>
+
+        <li class="work-item r" d="3" tabindex="0" role="link" aria-label="Project Gamma">
+          <span class="work-num">03</span>
+          <div class="work-body">
+            <h3 class="work-title">Project Gamma</h3>
+            <p class="work-meta">Python · FastAPI · Machine Learning · GCP</p>
+            <p class="work-desc">
+              Brief description. Mention scale, users, or a technical challenge that
+              makes this worth reading about.
+            </p>
+          </div>
+          <span class="work-year">2023</span>
+          <div class="work-arrow" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 17L17 7M17 7H7M17 7v10"/>
+            </svg>
+          </div>
+        </li>
+
+        <li class="work-item r" d="4" tabindex="0" role="link" aria-label="Project Delta">
+          <span class="work-num">04</span>
+          <div class="work-body">
+            <h3 class="work-title">Project Delta</h3>
+            <p class="work-meta">Go · gRPC · Docker · Kubernetes</p>
+            <p class="work-desc">
+              Infrastructure, tooling, or system-level work. What was the scale
+              and what did you learn from building it.
+            </p>
+          </div>
+          <span class="work-year">2023</span>
+          <div class="work-arrow" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 17L17 7M17 7H7M17 7v10"/>
+            </svg>
+          </div>
+        </li>
+
+        <li class="work-item r" d="5" tabindex="0" role="link" aria-label="Project Epsilon">
+          <span class="work-num">05</span>
+          <div class="work-body">
+            <h3 class="work-title">Project Epsilon</h3>
+            <p class="work-meta">Vue 3 · Supabase · Vercel · Tailwind</p>
+            <p class="work-desc">
+              Your most recent work. A great place to mention traction — early users,
+              revenue, or an interesting technical bet that paid off.
+            </p>
+          </div>
+          <span class="work-year">2022</span>
+          <div class="work-arrow" aria-hidden="true">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M7 17L17 7M17 7H7M17 7v10"/>
+            </svg>
+          </div>
+        </li>
+
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       STACK
+  ════════════════════════════════════════ -->
+  <section class="s" id="stack">
+    <div class="s-inner">
+      <span class="eyebrow r">Craft</span>
+      <p class="stack-text r" d="1">
+        Fluent in <strong>TypeScript</strong>, <strong>Python</strong>,
+        <strong>Go</strong>, and <strong>Rust</strong> — building with
+        <strong>React</strong>, <strong>Next.js</strong>, <strong>Node.js</strong>,
+        and <strong>FastAPI</strong>. Data lives in
+        <strong>PostgreSQL</strong> and <strong>Redis</strong>. Deployed on
+        <strong>AWS</strong> and <strong>GCP</strong>. Designed in
+        <strong>Figma</strong>. Brought to life with <strong>Three.js</strong>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       CONTACT
+  ════════════════════════════════════════ -->
+  <section class="s" id="contact">
+    <div class="s-inner" style="text-align:center; padding: 3rem 0;">
+      <span class="eyebrow r" style="display:inline-block;">Ready when you are</span>
+      <h2 class="contact-head r" d="1">Let's make<br>something.</h2>
+      <a href="mailto:your@email.com" class="contact-email r" d="2">your@email.com</a>
+      <div class="socials r" d="3">
+        <a href="#" aria-label="GitHub">GitHub</a>
+        <a href="#" aria-label="LinkedIn">LinkedIn</a>
+        <a href="#" aria-label="X / Twitter">X / Twitter</a>
+        <a href="#" aria-label="Blog">Blog</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════ -->
+  <footer>
+    <span>© 2025 Your Name</span>
+    <span>Made with Three.js &amp; unreasonable care.</span>
+  </footer>
+
+  <!-- ═══════════════════════════════════════
+       THREE.JS  — morphing blob
+  ════════════════════════════════════════ -->
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+
+    const canvas = document.getElementById('hero-canvas');
+    const isMobile = () => window.innerWidth < 768;
+
+    /* ── Renderer ─────────────────────────────────── */
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    /* ── Scene / camera ───────────────────────────── */
+    const scene  = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+    camera.position.z = 6;
+
+    /* ── Lights ───────────────────────────────────── */
+    scene.add(new THREE.AmbientLight(0x0D0818, 4));
+
+    const L1 = new THREE.PointLight(0x7C3AED, 16, 20);  // violet
+    const L2 = new THREE.PointLight(0xDB2777, 14, 20);  // rose
+    const L3 = new THREE.PointLight(0xEA580C, 10, 20);  // amber
+    scene.add(L1, L2, L3);
+
+    /* ── Morphing blob ────────────────────────────── */
+    const SEG = isMobile() ? 48 : 80;
+    const blobGeo = new THREE.SphereGeometry(2, SEG, SEG);
+    const orig    = Float32Array.from(blobGeo.attributes.position.array);
+
+    const blobMat = new THREE.MeshPhongMaterial({
+      color:     new THREE.Color(0x1A0838),
+      emissive:  new THREE.Color(0x08031A),
+      shininess: 90,
+      specular:  new THREE.Color(0x5B1EA0),
+    });
+
+    const blob = new THREE.Mesh(blobGeo, blobMat);
+    scene.add(blob);
+
+    /* ── Particle cloud ───────────────────────────── */
+    const PC  = isMobile() ? 400 : 900;
+    const pBuf = new Float32Array(PC * 3);
+    const pVel = new Float32Array(PC * 3);
+    for (let i = 0; i < PC; i++) {
+      const r  = 3.5 + Math.random() * 8;
+      const th = Math.random() * Math.PI * 2;
+      const ph = Math.acos(2 * Math.random() - 1);
+      pBuf[i*3]   = r * Math.sin(ph) * Math.cos(th);
+      pBuf[i*3+1] = r * Math.sin(ph) * Math.sin(th);
+      pBuf[i*3+2] = r * Math.cos(ph);
+      pVel[i*3]   = (Math.random() - 0.5) * 0.003;
+      pVel[i*3+1] = (Math.random() - 0.5) * 0.003;
+      pVel[i*3+2] = (Math.random() - 0.5) * 0.002;
+    }
+    const pGeo  = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pBuf, 3));
+    const pMat  = new THREE.PointsMaterial({
+      color: 0xCC99FF, size: 0.028, transparent: true, opacity: 0.5,
+      sizeAttenuation: true,
+    });
+    scene.add(new THREE.Points(pGeo, pMat));
+
+    /* ── Secondary glow shell ─────────────────────── */
+    const shellMat = new THREE.MeshBasicMaterial({
+      color: 0x3B0D6E, transparent: true, opacity: 0.08, side: THREE.BackSide,
+    });
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(2.55, 32, 32), shellMat));
+
+    /* ── Mouse ────────────────────────────────────── */
+    let mx = 0, my = 0, smx = 0, smy = 0;
+    window.addEventListener('mousemove', e => {
+      mx =  (e.clientX / window.innerWidth  - 0.5) * 2;
+      my = -(e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    /* ── Resize ───────────────────────────────────── */
+    function onResize() {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    onResize();
+    window.addEventListener('resize', onResize);
+
+    /* ── Morph fn ─────────────────────────────────── */
+    function morphBlob(t) {
+      const pos = blobGeo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const ox = orig[i*3], oy = orig[i*3+1], oz = orig[i*3+2];
+        const len = Math.sqrt(ox*ox + oy*oy + oz*oz);
+        const nx = ox/len, ny = oy/len, nz = oz/len;
+
+        const n =
+          0.40 * Math.sin(nx * 2.1 + t * 0.65) * Math.cos(ny * 1.9 - t * 0.50) +
+          0.22 * Math.cos(ny * 3.6 + t * 0.95) * Math.sin(nz * 2.8 + t * 0.60) +
+          0.11 * Math.sin(nz * 5.2 - t * 1.35) * Math.cos(nx * 4.4 + t * 0.78) +
+          0.05 * Math.sin(nx * 8.0 + t * 2.10) * Math.cos(ny * 7.2 - t * 1.80);
+
+        pos.setXYZ(i, nx*(len+n), ny*(len+n), nz*(len+n));
+      }
+      pos.needsUpdate = true;
+      blobGeo.computeVertexNormals();
+    }
+
+    /* ── Render loop ──────────────────────────────── */
+    const clock = new THREE.Clock();
+
+    (function loop() {
+      requestAnimationFrame(loop);
+      const t = clock.getElapsedTime();
+
+      smx += (mx - smx) * 0.03;
+      smy += (my - smy) * 0.03;
+
+      /* morph + rotate */
+      morphBlob(t * 0.42);
+      blob.rotation.y = t * 0.035 + smx * 0.40;
+      blob.rotation.x = t * 0.020 + smy * 0.28;
+      blob.rotation.z = t * 0.012;
+
+      /* orbit lights */
+      const r1 = 5.0, r2 = 4.5, r3 = 4.8;
+      L1.position.set(
+        Math.sin(t * 0.32) * r1,
+        Math.cos(t * 0.25) * r1,
+        Math.cos(t * 0.41) * 3.5
+      );
+      L2.position.set(
+        Math.cos(t * 0.44) * r2,
+        Math.sin(t * 0.52) * r2,
+        Math.sin(t * 0.36) * 4.0
+      );
+      L3.position.set(
+        Math.cos(t * 0.23) * r3,
+        Math.cos(t * 0.47) * 3.8,
+        Math.sin(t * 0.29) * r3
+      );
+
+      /* drift particles */
+      const a = pGeo.attributes.position.array;
+      for (let i = 0; i < PC; i++) {
+        a[i*3]   += pVel[i*3];
+        a[i*3+1] += pVel[i*3+1];
+        a[i*3+2] += pVel[i*3+2];
+        const d = Math.sqrt(a[i*3]**2 + a[i*3+1]**2 + a[i*3+2]**2);
+        if (d < 2.2 || d > 14) {
+          pVel[i*3]   *= -1;
+          pVel[i*3+1] *= -1;
+          pVel[i*3+2] *= -1;
+        }
+      }
+      pGeo.attributes.position.needsUpdate = true;
+
+      renderer.render(scene, camera);
+    })();
+  </script>
+
+  <!-- ═══════════════════════════════════════
+       GRAIN  — JS-generated noise texture
+  ════════════════════════════════════════ -->
+  <script>
+    (function () {
+      const c = document.createElement('canvas');
+      c.width = c.height = 256;
+      const ctx = c.getContext('2d');
+      const img = ctx.createImageData(256, 256);
+      for (let i = 0; i < img.data.length; i += 4) {
+        const v = Math.random() * 255 | 0;
+        img.data[i] = img.data[i+1] = img.data[i+2] = v;
+        img.data[i+3] = 255;
+      }
+      ctx.putImageData(img, 0, 0);
+      const grain = document.getElementById('grain');
+      grain.style.backgroundImage  = `url(${c.toDataURL()})`;
+      grain.style.backgroundRepeat = 'repeat';
+    })();
+  </script>
+
+  <!-- ═══════════════════════════════════════
+       CURSOR
+  ════════════════════════════════════════ -->
+  <script>
+    (function () {
+      const dot  = document.getElementById('c-dot');
+      const ring = document.getElementById('c-ring');
+      let cx = -100, cy = -100, tx = -100, ty = -100;
+
+      window.addEventListener('mousemove', e => { tx = e.clientX; ty = e.clientY; });
+
+      /* dot: immediate */
+      window.addEventListener('mousemove', e => {
+        dot.style.left = e.clientX + 'px';
+        dot.style.top  = e.clientY + 'px';
+      });
+
+      /* ring: lagged lerp */
+      (function animRing() {
+        requestAnimationFrame(animRing);
+        cx += (tx - cx) * 0.1;
+        cy += (ty - cy) * 0.1;
+        ring.style.left = cx + 'px';
+        ring.style.top  = cy + 'px';
+      })();
+
+      /* hover states */
+      document.querySelectorAll('a, button, .work-item').forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+      });
+    })();
+  </script>
+
+  <!-- ═══════════════════════════════════════
+       SCROLL REVEAL
+  ════════════════════════════════════════ -->
+  <script>
+    (function () {
+      const io = new IntersectionObserver(
+        entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); }),
+        { threshold: 0.12 }
+      );
+      document.querySelectorAll('.r').forEach(el => io.observe(el));
+    })();
+  </script>
+
+</body>
+</html>
